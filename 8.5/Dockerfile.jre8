@@ -1,0 +1,23 @@
+#FROM davidcaste/alpine-java-unlimited-jce:jre8
+FROM adoptopenjdk/openjdk8:alpine-jre
+
+ENV CATALINA_HOME=/usr/local/tomcat
+ENV PATH=$CATALINA_HOME/bin:$PATH
+ENV TOMCAT_MAJOR=8
+ENV TOMCAT_VERSION=8.5.64
+
+RUN set -x && \
+    apk upgrade --update && \
+    apk add --update curl && \
+    curl -jksSL -o /tmp/apache-tomcat.tar.gz http://archive.apache.org/dist/tomcat/tomcat-${TOMCAT_MAJOR}/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz && \
+    cd /tmp && \
+    tar -zxf apache-tomcat.tar.gz && \
+    mv apache-tomcat-${TOMCAT_VERSION} /usr/local/tomcat && \
+    rm -f /tmp/apache-tomcat.tar.gz && \
+    rm -rf ${CATALINA_HOME}/webapps/* && \
+    apk del curl && \
+    rm -rf /tmp/* /var/cache/apk/*
+
+EXPOSE 8080
+
+CMD ["catalina.sh", "run"]
